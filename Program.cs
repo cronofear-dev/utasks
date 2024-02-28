@@ -21,7 +21,7 @@ public static class Program
 {
     
 #if DEBUG
-    private static string _debugCurrentPath = @"C:\WS\SkillCraftGame";
+    private static string _debugCurrentPath = @"C:\OnlyDebug\Path\To\Your\Project";
 #endif
     private static USettings _settings = new USettings();
     private static List<ITaskPreAction> _taskPreActions;
