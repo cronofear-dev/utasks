@@ -217,26 +217,13 @@
             "Title" : "Package Plugins (${PluginPackageArgs})",
             "Subtasks" : "GetPluginSubtasks",
             "SubtasksFilters" : ["FilterByInput"],
-            // `RunSubtasksForPlugins` is a special action for plugins that let's us confirm the options we selected and shows the list of plugins to be packaged after all the filters have been applied
+            // `RunSubtasksForPlugins` is a special action for plugins that let us confirm the options we selected and shows the list of plugins to be packaged after all the filters have been applied
             // It's essentially an `Are you sure you want to continue?` special action
             "SubtasksAction" : "RunSubtasksForPlugins",
             // `PackagePlugins` is an action that performs an operation on all successTasks and failedTasks
             // For Plugins that failed to be packaged, removes the folder created for the packaging `${PluginsOutputPath}\\ParentFolderOfPlugin`
             // For Plugins that were packaged correctly, show more options (Zipping Source Files, Zipping Compiled Files, Deleting `${PluginsOutputPath}\\ParentFolderOfPlugin`)
             "TaskPostAction" : "PackagePlugins"
-        },
-        {
-            "Id" : "AngelscriptTest",
-            "Title" : "Angelscript Simulated Cook Compilation",
-            "Subtasks" :
-            [
-                {
-                    "Msg" : "Angelscript Simulated Cook Compilation",
-                    "Program" : "${UnrealEditor_Cmd_exe}",
-                    "Args" : "${UProjectFilePath} -as-simulate-cooked -run=AngelscriptTest"
-                }
-            ],
-            "SubtasksAction" : "RunSubtasks"
         }
     ],
     "AutoTasks" : 
