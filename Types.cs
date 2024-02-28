@@ -148,5 +148,7 @@ public class USettings
     {
         StringVariables.Clear();
         Tasks.Clear();
+        AutoTasks.Clear();
+        BufferedInputs.Clear();
     }
 }
