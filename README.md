@@ -21,6 +21,9 @@ The reason being that this program may be flagged by your antivirus (It's a fals
 
 # Features
 
+![](https://raw.githubusercontent.com/cronofear-dev/utasks/main/Documentation/tasks.png)
+![](https://raw.githubusercontent.com/cronofear-dev/utasks/main/Documentation/subtasks.png)
+
 The program already comes with variables and tasks defined. But you can easily extend/modify it.
 
 See: 
