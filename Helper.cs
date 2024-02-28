@@ -228,30 +228,4 @@ public static class Helper
 
         return singletons;
     }
-    
-    public static void SendCommandToTerminal(string input)
-    {
-        ProcessStartInfo psi = new ProcessStartInfo
-        {
-            FileName = "cmd", // or "/usr/bin/env", "python", etc., depending on the terminal and command
-            RedirectStandardInput = true, // to enable providing input to the terminal
-            RedirectStandardOutput = true, // to enable reading output from the terminal
-            RedirectStandardError = true,
-            UseShellExecute = false
-        };
-    
-        Process p = Process.Start(psi);
-
-        // Send a command to the terminal
-        StreamWriter sw = p.StandardInput;
-        sw.WriteLine(input);
-
-        // Optionally, you may want to read the output or error produced by the command
-        string output = p.StandardOutput.ReadToEnd();
-        string error = p.StandardError.ReadToEnd();
-
-        // Don't forget to close the process
-        p.WaitForExit();
-        p.Close();
-    }
 }
