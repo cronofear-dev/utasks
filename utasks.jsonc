@@ -1,0 +1,273 @@
+{
+    // ${NameOfVar} is used to get the first value of a variable (in case it has a list of values)
+    // %{NameOfVar} is used to get a list of values
+    // ${CURRENT_PATH} is a default property that points to the path of the current folder (where utasks.exe lives).
+
+    // *******************************************
+    // Program Settings
+    // *******************************************
+    
+    "DefaultMainMenu" : "Tasks", // Tasks | AutoTasks
+    
+    // *******************************************
+    // Main Settings (Required for working with UE projects)
+    // *******************************************
+    
+    // The name of the .uproject file. 
+    // Default settings will obtain the first .uproject file name found in the current folder
+    // Alternatively use the literal name of the .uproject file, without the extension (i.e "LyraGame")
+    "UProjectFileName" : "${${CURRENT_PATH} -> *.uproject}->Replace('.uproject','')",
+    "UProjectFilePath" : "${CURRENT_PATH}\\${UProjectFileName}.uproject",
+    
+    // The path to the engine folder.
+    // ENGINE_PATH will attempt to obtain the path of the engine by parsing the .uproject file ("EngineAssociation")
+    // Alternatively use the literal path to the engine folder (i.e "C:\\Program Files\\Epic Games\\UE_5.3\\Engine")
+    // Note: This needs to be defined after `UProjectFilePath`
+    "EnginePath" : "${ENGINE_PATH}",
+
+    // *******************************************
+    // Target Names
+    // *******************************************
+
+    // Attempt to get the target names from the .Target.cs files in the Source folder
+    // Alternatively use the literal name of the target names
+    "GameTargetName" : "${${CURRENT_PATH}\\Source -> *.Target.cs}->Replace('.Target.cs','')",
+    "EditorTargetName" : "${${CURRENT_PATH}\\Source -> *Editor.Target.cs}->Replace('.Target.cs','')",
+    
+    // *******************************************
+    // Relevant programs in ${EnginePath}. Used for most operations related to the associated engine.
+    // *******************************************
+    
+    "Build_bat" : "${EnginePath}\\Build\\BatchFiles\\Build.bat",
+    "RunUAT_bat" : "${EnginePath}\\Build\\BatchFiles\\RunUAT.bat",
+    "UnrealEditor_exe" : "${EnginePath}\\Binaries\\Win64\\UnrealEditor.exe",
+    "UnrealEditor_Cmd_exe" : "${EnginePath}\\Binaries\\Win64\\UnrealEditor-Cmd.exe",
+    "UnrealBuildTool_exe" : "${EnginePath}\\Binaries\\DotNET\\UnrealBuildTool\\UnrealBuildTool.exe",
+    
+    // *******************************************
+    // Settings for Project Packaging
+    // *******************************************
+    
+    "ProjectOutputPath": "${CURRENT_PATH}\\Binaries\\${UProjectFileName}",
+    
+    // *******************************************
+    // Settings for Plugin Packaging
+    // *******************************************
+    
+    // The list of plugin names in `Project/Plugins`
+    // Default Setting excludes all `.uplugin` names starting with `CL` and 'Lyra' and also `OtherPluginName`
+    "PluginNames" : "${CURRENT_PATH}\\Plugins\\%{${CURRENT_PATH}\\Plugins -> **\\*.uplugin -> !**\\CL* -> !**\\OtherPluginName*}", //!**\\Lyra*
+    "PluginPackageArgs" : "-Rocket -TargetPlatforms=Win64",
+    "PluginsOutputPath" : "${CURRENT_PATH}\\Binaries\\Plugins",
+    "ZippedPluginsOutputPath" : "${CURRENT_PATH}\\Binaries\\Plugins",
+
+    // *******************************************
+    // Settings for Opening Levels
+    // *******************************************
+    
+    // Level Reference paths that can be opened with the tool
+    // Default setting gets the references of the .umap files inside Project/Content
+    "LevelReferences" : ["${CURRENT_PATH}\\Content\\%{${CURRENT_PATH}\\Content -> **\\*.umap}"],
+
+    // *******************************************
+    // Settings for Source Engine Build
+    // *******************************************
+    
+    "UESourcePath" : "${CURRENT_PATH}",
+    "UESourceOutputPath" : "${UESourcePath}\\OUTPUT",
+    "UESource_Setup_bat" : "${UESourcePath}\\Setup.bat",
+    "UESource_GenerateProjectFiles_bat" : "${UESourcePath}\\GenerateProjectFiles.bat",
+    "UESource_RunUAT_bat" : "${UESourcePath}\\Engine\\Build\\BatchFiles\\RunUAT.bat",
+    
+    // *******************************************
+    // Custom Settings
+    // *******************************************
+    "TargetConfigurations" : ["DebugGame", "Development", "Shipping"],
+    "TargetPlatforms" : ["Win64", "Win32"],
+    "TargetNames" : ["${GameTargetName}", "${EditorTargetName}"],
+    
+    // *******************************************
+    // For testing
+    // *******************************************
+    "TestParentPath" : "${CURRENT_PATH}\\..\\OLD\\UEAS53",
+    "TestAbsPath" : "C:\\Program Files\\Epic Games\\UE_5.3\\Engine",
+    "TestJustAString" : "Just a string",
+    
+    // *******************************************
+    // Tasks
+    // *******************************************
+    "Tasks":
+    [
+        {
+            "Id" : "GenerateAndBuildProject",
+            "Title" : "Generate and Build the Project (Win64 | Development Editor)",
+            "Subtasks" :
+            [
+                {
+                    "Msg" : "Generate Project Files",
+                    "Program" : "${UnrealBuildTool_exe}",
+                    "Args" : "-projectfiles -project=${UProjectFilePath} -game -rocket -progress"
+                },
+                {
+                    "Msg" : "Remove generated `.vs` folder and `.sln`/`.vsconfig` files",
+                    "Program" : "CMD.exe",
+                    "Args" : "rmdir /S /Q .vs && del /Q ${UProjectFileName}.sln && del /Q .vsconfig"
+                },
+                {
+                    "Msg" : "Build The Project (Win64 | Development Editor)",
+                    "Program" : "${Build_bat}",
+                    "Args" : "${EditorTargetName} Win64 Development ${UProjectFilePath} -waitmutex"
+                }
+            ],
+            "SubtasksFilters" : [ "FilterByInput" ],
+            "SubtasksAction" : "RunSubtasks"
+        },
+        {
+            "Id" : "BuildProject",
+            "Title" : "Build the Project (Multiple Configurations)",
+            "Subtasks" :
+            [
+                {
+                    "Msg" : "Build the Project (Win64 | DebugGame Editor)",
+                    "Program" : "${Build_bat}",
+                    "Args" : "${EditorTargetName} Win64 DebugGame ${UProjectFilePath} -waitmutex"
+                },
+                {
+                    "Msg" : "Build the Project (Win64 | Development Editor)",
+                    "Program" : "${Build_bat}",
+                    "Args" : "${EditorTargetName} Win64 Development ${UProjectFilePath} -waitmutex"
+                },
+                {
+                    "Msg" : "Build the Project (Win64 | %{TargetConfigurations} Game)",
+                    "Program" : "${Build_bat}",
+                    "Args" : "${GameTargetName} Win64 %{TargetConfigurations} ${UProjectFilePath} -waitmutex"
+                }
+            ],
+            "SubtasksFilters" : [ "FilterByInput" ],
+            "SubtasksAction" : "RunSubtasks"
+        },
+        {
+            "Id" : "OpenLevel",
+            "Title" : "Open Level (No Editor)",
+            "Subtasks" :
+            [
+                {
+                    "Msg" : "Open Level (%{LevelReferences})",
+                    "Program" : "${UnrealEditor_exe}",
+                    "Args" : "${UProjectFilePath} %{LevelReferences} -game -log -nosteam -ResX=1920 -ResY=1080 -WinX=192 -WinY=108 -windowed"
+                }
+            ],
+            "SubtasksFilters" : [ "FilterByInputSingleOption" ],
+            "SubtasksAction" : "RunSubtasks"
+        },
+        {
+            "Id" : "BuildEngine",
+            "Title" : "Build Engine From Source (Installed Build | Win64 | Server & Client)",
+            "Subtasks" :
+            [
+                {
+                    "Msg" : "Remove Hololens Folder",
+                    "Program" : "rmdir /S /Q ${UESourcePath}\\Engine\\Platforms\\Hololens",
+                    "Args" : ""
+                },
+                {
+                    "Msg" : "Run Setup.bat (Download Assets)",
+                    "Program" : "${UESource_Setup_bat}",
+                    "Args" : ""
+                },
+                {
+                    "Msg" : "Run GenerateProjectFiles.bat (Generate Engine Project Files)",
+                    "Program" : "${UESource_GenerateProjectFiles_bat}",
+                    "Args" : ""
+                },
+                {
+                    "Msg" : "Make Installed Engine Build (May take several hours)",
+                    "Program" : "${UESource_RunUAT_bat}",
+                    "Args" : "BuildGraph -target=\"Make Installed Build Win64\" -script=${UESourcePath}\\Engine\\Build\\InstalledEngineBuild.xml -set:HostPlatformOnly=true -set:WithServer=true -set:WithClient=true -set:WithDDC=false -set:BuiltDirectory=${UESourceOutputPath}"
+                },
+                {
+                    "Msg" : "Put the Computer to Sleep/Hibernate (60 seconds timeout)",
+                    "Program" : "cmd.exe",
+                    "Args" : "echo Your computer will go to sleep/Hibernate in 60 seconds, press [CTRL+C] to cancel... && timeout /t 60 && rundll32.exe powrprof.dll,SetSuspendState 0,1,0"
+                }
+            ],
+            "SubtasksFilters" : [ "FilterByInput" ],
+            "SubtasksAction" : "RunSubtasks"
+        },
+        {
+            "Id" : "PackageProject",
+            "Title" : "Package Project (Win64 | Multiple Configurations)",
+            "Subtasks" :
+            [
+                {
+                    "Msg" : "Package Project (Win64 | %{TargetConfigurations} Game)",
+                    "Program" : "${RunUAT_bat}",
+                    "Args" : "-ScriptsForProject=\"${UProjectFilePath}\" Turnkey -command=VerifySdk -platform=Win64 -UpdateIfNeeded -EditorIO -EditorIOPort=8531  -project=\"${UProjectFilePath}\" BuildCookRun -nop4 -utf8output -nocompileeditor -skipbuildeditor -cook  -project=\"${UProjectFilePath}\" -target=${GameTargetName}  -unrealexe=\"${UnrealEditor_Cmd_exe}\" -platform=Win64 -installed -stage -archive -package -build -pak -iostore -compressed -prereqs -archivedirectory=\"${ProjectOutputPath}\" -clientconfig=%{TargetConfigurations} -nodebuginfo"
+                }
+            ],
+            "SubtasksFilters" : ["FilterByInputSingleOption"],
+            "SubtasksAction" : "RunSubtasks"
+        },
+        // For this particular task, the Subtasks are created by calling the C# method GetPluginSubtasks(). The subtasks are build in the format:
+        // "Msg" : "${PluginName} (ParentFolderOfPlugin)",
+        // "Program" : "${RunUAT_bat}",
+        // "Args" : "BuildPlugin -Plugin=\"%{PluginName}\" -Package=\"${PluginsOutputPath}\\ParentFolderOfPlugin\" ${PluginPackageArgs}"
+        {
+            "Id" : "PackagePlugins",
+            "Title" : "Package Plugins (${PluginPackageArgs})",
+            "Subtasks" : "GetPluginSubtasks",
+            "SubtasksFilters" : ["FilterByInput"],
+            // `RunSubtasksForPlugins` is a special action for plugins that let's us confirm the options we selected and shows the list of plugins to be packaged after all the filters have been applied
+            // It's essentially an `Are you sure you want to continue?` special action
+            "SubtasksAction" : "RunSubtasksForPlugins",
+            // `PackagePlugins` is an action that performs an operation on all successTasks and failedTasks
+            // For Plugins that failed to be packaged, removes the folder created for the packaging `${PluginsOutputPath}\\ParentFolderOfPlugin`
+            // For Plugins that were packaged correctly, show more options (Zipping Source Files, Zipping Compiled Files, Deleting `${PluginsOutputPath}\\ParentFolderOfPlugin`)
+            "TaskPostAction" : "PackagePlugins"
+        },
+        {
+            "Id" : "AngelscriptTest",
+            "Title" : "Angelscript Simulated Cook Compilation",
+            "Subtasks" :
+            [
+                {
+                    "Msg" : "Angelscript Simulated Cook Compilation",
+                    "Program" : "${UnrealEditor_Cmd_exe}",
+                    "Args" : "${UProjectFilePath} -as-simulate-cooked -run=AngelscriptTest"
+                }
+            ],
+            "SubtasksAction" : "RunSubtasks"
+        }
+    ],
+    "AutoTasks" : 
+    [
+        {
+            "Id" : "DefaultBuildEditor",
+            "Title" : "Default Build Editor",
+            "StepsDescriptions" : ["Generate and Build the Project (Win64 | Development Editor) all in one step"],
+            "Steps" : ["GenerateAndBuildProject 0"]
+        },
+        {
+            "Id" : "TestLevel1",
+            "Title" : "Test Level 1",
+            "StepsDescriptions" : ["Generate and Build the Project (Win64 | Development Editor)", "Open Level 1"],
+            "Steps" : ["GenerateAndBuildProject 0", "OpenLevel 1"]
+        },
+        {
+            "Id" : "TestBuildAndZipAllPlugins",
+            "Title" : "TestBuildAndZipAllPlugins",
+            "StepsDescriptions" : ["Package first plugin", "Zip them for distribution (both only source and compiled files)"],
+            "Steps" : ["PackagePlugins 1 <enter> 1,2"]
+        }
+    ]
+}
+
+// Things you can do:
+// - add an additional task (show Angelscript task as an example)
+// - expand subtasks (add shutdown computer after Build Engine From Source)
+// - create your own variables ("buildServer", "buildClient" as an example?)
+// Compose autotasks and tasks: `.\utasks.exe a=DefaultBuildEditor "," OpenLevel 1`
+// Compose autotasks and tasks: `.\utasks.exe a=DefaultBuildEditor "," PackagePlugins 1 "<enter>" "1,2"`
+
+// Notes:
+// Task Id is optional, only used for autotasks
