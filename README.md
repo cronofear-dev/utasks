@@ -48,7 +48,7 @@ See:
 // Upon which the value of `UProjectFileName` can be used as a parameter for other variables
 "UProjectFilePath" : "${CURRENT_PATH}\\${UProjectFileName}.uproject",
 
-// Similar to how `EditorTargetName` is defined, but
+// Similar to how `UProjectFileName` is defined, but
 // `${CURRENT_PATH}\\Plugins\\` is appended to `%{${CURRENT_PATH}\\Plugins -> **\\*.uplugin -> !**\\CL* -> !**\\Lyra* -> !**\\OtherPluginName*}`
 // `%{PathToSearch -> **\\*.uplugin -> !**\\CL* -> !**\\Lyra* -> !**\\OtherPluginName*}`  applies inclusion and exclusion patterns
 // The glob pattern will search all `.uplugin` files recursively and exclude files that start with `CL`, `Lyra` and also exclude `OtherPluginName`
