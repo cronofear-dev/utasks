@@ -161,5 +161,5 @@ The program has many hard edges as it's mostly developed solely for my personal 
 It should work well as long as the variables and tasks are defined in a similar manner to the default ones.
 That being said, these are the limitations and knows issues that you may face:
 - Multiple uses of the `%` symbol are not supported both for creating and using the variables
-- A variable with multiple values (`%`) can only be used to define multiple `Subtasks` atm. It may work if used in other parameters, I'm not sure.
+- A variable with multiple values (`%`) can only be used to define multiple `Subtasks` atm. It may work if used in other parameters.
 
