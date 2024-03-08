@@ -1,15 +1,6 @@
 .NET Console Application for composing tasks for Unreal Engine (It can be used in other applications as well). 
 
-By default, the program lets you build your project in different configurations, build the engine from source, open levels without the editor, package your project or your plugins. This is similar to [Unreal Binary Builder](https://github.com/ryanjon2040/Unreal-Binary-Builder), but this program is terminal based so it could be easily hooked to a CI/CD environment, among other things. The default settings are somewhat opinionated (It's setup for Win64). The tasks can easily be modified, removed or extended by just modifying the `.json` file, and new C# scripts (for more complex behavior) can be created by implementing the program's interfaces.
-
-# NOTE:
-I recommend building this program on your own. It's a matter of installing .NET 8 and running this on the root of the project:
-
-`dotnet publish -r win-x64 --self-contained=false /p:PublishSingleFile=true /p:DebugType=None`
-
-The reason being that this program may be flagged by your antivirus (It's a false positive). I have some theories why it's happening, but I won't change the code as it works fine on my machine™. If you're interested in taking a look into it, I would recommend checking on the following:
-- The use of `/p:PublishSingleFile=true` that packages the program into a single .exe (This is probably the main culprit)
-- The use of `using Microsoft.Win32;` for reading the windows registry (required to obtain the path to the Unreal Engine installation)
+By default, the program lets you build your project in different configurations, build the engine from source, open levels without the editor, package your project or your plugins. This is similar to [Unreal Binary Builder](https://github.com/ryanjon2040/Unreal-Binary-Builder), but this program is terminal-based so it could be easily hooked to a CI/CD environment, among other things. The default settings are somewhat opinionated (It's setup for Win64). The tasks can easily be modified, removed or extended by just modifying the `.json` file, and new C# scripts (for more complex behavior) can be created by implementing the program's interfaces.
 
 # How to use (Minimal Setup)
 
