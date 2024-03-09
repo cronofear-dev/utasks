@@ -1,6 +1,6 @@
 .NET Console Application for composing tasks for Unreal Engine (It can be used in other applications as well). 
 
-By default, the program lets you build your project in different configurations, build the engine from source, open levels without the editor, package your project or your plugins. This is similar to [Unreal Binary Builder](https://github.com/ryanjon2040/Unreal-Binary-Builder), but this program is terminal-based so it could be easily hooked to a CI/CD environment, among other things. The default settings are somewhat opinionated (It's setup for Win64). The tasks can easily be modified, removed or extended by just modifying the `.json` file, and new C# scripts (for more complex behavior) can be created by implementing the program's interfaces.
+By default, the program lets you build your project in different configurations, build the engine from source, open levels without the editor, package your project or your plugins. This is similar to [Unreal Binary Builder](https://github.com/ryanjon2040/Unreal-Binary-Builder), but this program is a CLI so it could be easily hooked to a CI/CD environment, among other things. The default settings are somewhat opinionated (It's setup for Win64). The tasks can easily be modified, removed or extended by just modifying the `.json` file, and new C# scripts (for more complex behavior) can be created by implementing the program's interfaces.
 
 # How to use (Minimal Setup)
 
@@ -56,7 +56,7 @@ See:
 ```
 ### Use the variables to compose your own tasks
 ```jsonc
-// The Id is optional and can be used for composing `AutoTasks` of for calling this task from the terminal
+// The Id is optional and can be used for composing `AutoTasks` of for calling this task from the CLI
 "Id" : "BuildProject",
 "Title" : "Build the Project (Multiple Configurations)",
 "Subtasks" :
@@ -143,7 +143,7 @@ See:
     "Steps" : ["GenerateAndBuildProject 0", "OpenLevel 1"]
 },
 ```
-By composing tasks or autotasks, it's possible to call these tasks in with program arguments in the terminal as well (By using the Id). This can be useful for using the program with a CI/CD application:
+By composing tasks or autotasks, it's possible to call these tasks in with program arguments in the CLI as well (By using the Id). This can be useful for using the program with a CI/CD application:
 - `.\utasks.exe a=DefaultBuildEditor "," OpenLevel 1` Will call the `AutoTask` named `DefaultBuildEditor`, then call the `Task` named `OpenLevel` and buffer the input `1`
 - `.\utasks.exe a=DefaultBuildEditor "," PackagePlugins 1 "<enter>" "1,2"` Similar to the previous example, `"<enter>"` is a special input for `empty` and `"1,2"` is an input that selects the choice `1` and `2` (Ranges are supported as well i.e. `"1,3-5"`)
 
